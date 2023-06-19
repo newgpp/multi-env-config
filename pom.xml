@@ -51,16 +51,20 @@
     </profiles>
 
     <build>
-        <filters>
-            <!-- 这里的文件名必须与多环境配置文件的文件名相同, ${env} 会动态获取不同环境 -->
-            <!-- 假如激活 dev 环境, 这时对应的文件就是 src/main/properties/application-dev.properties -->
-            <filter>src/main/resources/application-${active.env}.yaml</filter>
-        </filters>
         <resources>
             <resource>
-                <!-- 可以理解为真正的配置文件所在的目录 -->
                 <directory>src/main/resources</directory>
-                <!-- 是否替换资源中的属性, 设置为 true 才能实现动态替换 -->
+                <excludes>
+                    <exclude>*.yaml</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application.yaml</include>
+                    <include>application-${active.env}.yaml</include>
+                </includes>
                 <filtering>true</filtering>
             </resource>
         </resources>
