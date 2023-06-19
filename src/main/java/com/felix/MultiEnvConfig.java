@@ -2,7 +2,6 @@ package com.felix;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.IOException;
@@ -15,19 +14,29 @@ import java.io.InputStream;
  */
 public class MultiEnvConfig {
 
+    private static ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
     public static void main(String[] args) {
-        String env = args.length > 0 ? args[0] : "test";
-        System.out.println("active.env:" + env);
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
-        InputStream is = MultiEnvConfig.class.getClassLoader().getResourceAsStream(String.format("application-%s.yaml", env));
+
+        String env = extracted("application.yaml", "env");
+
+        String address = extracted(String.format("application-%s.yaml", env), "address");
+
+        System.out.println("active.env:" + env + ", address:" + address);
+
+
+    }
+
+    private static String extracted(String fileName, String field) {
+        InputStream is = MultiEnvConfig.class.getClassLoader().getResourceAsStream(fileName);
         JsonNode jsonNode = null;
         try {
             jsonNode = mapper.readTree(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(jsonNode);
+
+        return jsonNode.get(field).asText();
     }
 
 
